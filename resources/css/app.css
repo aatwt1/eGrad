@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   GLOBAL
+========================= */
+
+body {
+    @apply bg-gray-100 text-gray-800 font-sans;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+nav {
+    @apply bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between;
+}
+
+nav a {
+    @apply text-gray-700 font-medium mr-6 hover:text-blue-600 transition;
+}
+
+nav a.active {
+    @apply text-blue-600 font-semibold;
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+main {
+    @apply max-w-7xl mx-auto p-6;
+}
+
+h1 {
+    @apply text-3xl font-bold mb-6;
+}
+
+h2 {
+    @apply text-xl font-semibold mb-4;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn {
+    @apply inline-block px-4 py-2 rounded-md font-medium transition;
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+}
+
+/* =========================
+   TABLES
+========================= */
+
+table {
+    @apply w-full bg-white shadow-sm rounded-lg overflow-hidden;
+}
+
+th {
+    @apply bg-gray-100 text-left px-4 py-3 text-sm font-semibold text-gray-600;
+}
+
+td {
+    @apply px-4 py-3 border-t text-sm;
+}
+
+/* =========================
+   FORMS
+========================= */
+
+label {
+    @apply block mb-1 font-medium;
+}
+
+input,
+textarea,
+select {
+    @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.form-group {
+    @apply mb-4;
+}
+
+
+.card {
+    @apply bg-white rounded-lg shadow-sm p-6 mb-4;
+}
+
+.card-title {
+    @apply text-xl font-semibold mb-2;
+}
+
+.card-meta {
+    @apply text-sm text-gray-500 mb-4;
+}
+
+/* =========================
+   STATUS BADGES
+========================= */
+
+.badge {
+    @apply inline-block px-2 py-1 text-xs rounded-full font-medium;
+}
+
+.badge-approved {
+    @apply bg-green-100 text-green-700;
+}
+
+.badge-pending {
+    @apply bg-yellow-100 text-yellow-700;
+}
+
+.badge-rejected {
+    @apply bg-red-100 text-red-700;
+}
