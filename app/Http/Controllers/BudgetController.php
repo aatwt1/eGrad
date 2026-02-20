@@ -73,13 +73,5 @@ class BudgetController extends Controller
     }
     */
 
-    public function vote(Initiative $initiative)
-    {
-        $initiative->votes()->updateOrCreate(
-            ['user_id' => Auth::id()],
-            ['vote' => 1] // +1
-        );
-
-        return back()->with('success', 'You voted for this initiative.');
-    }
+   
 }

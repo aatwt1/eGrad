@@ -1,0 +1,197 @@
+.vote-float-button {
+    position: sticky;
+    top: 100px;
+    right: 20px;
+    z-index: 40;
+    float: right;
+    margin-left: auto;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .vote-float-button {
+        position: fixed;
+        bottom: 20px;
+        top: auto;
+        right: 20px;
+        left: auto;
+        width: auto;
+    }
+}
+
+/* Stil za disabled dugme (sivo) */
+.vote-btn-disabled {
+    background-color: #9ca3af !important;
+    cursor: not-allowed;
+    position: relative;
+    opacity: 0.7;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: none;
+    color: white;
+}
+
+/* Tooltip za disabled dugme */
+.vote-btn-disabled:hover::after {
+    content: "🚫 Nije moguće glasati";
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 8px;
+    background-color: #1f2937;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 50;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Strelica za tooltip */
+.vote-btn-disabled:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    right: 20px;
+    margin-bottom: 0px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #1f2937 transparent transparent transparent;
+    transform: rotate(180deg);
+    z-index: 50;
+}
+
+/* Stil za aktivno dugme (zeleno) */
+.vote-btn-active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.vote-btn-active:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.4), 0 10px 10px -5px rgba(16, 185, 129, 0.2);
+}
+
+.vote-btn-active:active {
+    transform: translateY(0);
+}
+
+/* Stil za SVG ikonice unutar dugmadi */
+.vote-btn-active svg,
+.vote-btn-disabled svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+/* Stil za indikator glasanja u tabeli */
+.vote-indicator {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.vote-indicator.voted {
+    color: #059669;
+}
+
+.vote-indicator.not-voted {
+    color: #6b7280;
+}
+
+/* Stil za broj glasova */
+.vote-count {
+    font-weight: 600;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.vote-count.has-votes {
+    color: #2563eb;
+}
+
+.vote-count.no-votes {
+    color: #9ca3af;
+}
+
+/* Animacija za klik na dugme */
+@keyframes vote-pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.vote-btn-active:active {
+    animation: vote-pulse 0.3s ease;
+}
+
+/* Stil za različite statuse */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Stil za filter dugmad */
+.filter-button {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.filter-button.active {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.filter-button.inactive {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.filter-button.inactive:hover {
+    background-color: #e5e7eb;
+}

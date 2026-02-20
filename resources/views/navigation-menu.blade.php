@@ -6,29 +6,29 @@
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
                     <a href="{{ route('dashboard') ?? url('/') }}" class="flex items-center">
-                        <span class="text-xl font-bold text-blue-700">Digitalna Općina Atl</span>
+                        <span class="text-xl font-bold text-blue-400">Digitalna Općina Atl</span>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation Links -->
                 <div class="hidden sm:ml-10 sm:flex sm:space-x-8">
                     <a href="{{ route('dashboard') ?? url('/') }}" 
-                       class="{{ request()->routeIs('dashboard') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                       class="{{ request()->routeIs('dashboard') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Početna
                     </a>
                     
                     <a href="{{ route('budgets.index') ?? '#' }}" 
-                       class="{{ request()->routeIs('budgets.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                       class="{{ request()->routeIs('budgets.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Budžet
                     </a>
                     
                     <a href="{{ route('initiatives.index') ?? '#' }}" 
-                       class="{{ request()->routeIs('initiatives.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                       class="{{ request()->routeIs('initiatives.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Inicijative
                     </a>
                     
                     <a href="{{ route('reported-issues.index') ?? '#' }}" 
-                       class="{{ request()->routeIs('reported-issues.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                       class="{{ request()->routeIs('reported-issues.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                         Prijava problema
                     </a>
                 </div>

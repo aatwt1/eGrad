@@ -11,9 +11,28 @@
             </div>
 
             <div class="flex gap-2">
+                <!-- Edit dugme -->
+                <a href="{{ route('reported-issues.edit', $reportedIssue) }}"
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Uredi
+                </a>
+                
+                <!-- Delete dugme -->
+                <button onclick="openDeleteModal()"
+                        class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Obriši
+                </button>
+                
+                <!-- Nazad dugme -->
                 <a href="{{ route('reported-issues.index') }}"
                    class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
-                    ← Nazad na listu
+                    ← Nazad
                 </a>
             </div>
         </div>
@@ -188,9 +207,9 @@
                                                 <span class="font-medium text-gray-900">
                                                     {{ $comment->user->name }}
                                                 </span>
-                                                @if($comment->user->hasRole('admin'))
+                                                @if($comment->user->isAdmin())
                                                     <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                                                        administrator
+                                                        Administrator
                                                     </span>
                                                 @endif
                                             </div>
@@ -252,4 +271,61 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2">Potvrdi brisanje</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Da li ste sigurni da želite obrisati problem <span class="font-semibold">{{ $reportedIssue->title }}</span>?
+                    </p>
+                    @if($reportedIssue->comments->count() > 0)
+                        <p class="text-xs text-red-500 mt-2">
+                            ⚠️ Ovaj problem ima {{ $reportedIssue->comments->count() }} komentara koji će također biti obrisani.
+                        </p>
+                    @endif
+                </div>
+                <div class="flex justify-center space-x-4 px-4 py-3">
+                    <button onclick="closeDeleteModal()" 
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition">
+                        Odustani
+                    </button>
+                    <form id="deleteForm" method="POST" action="{{ route('reported-issues.destroy', $reportedIssue) }}" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                            Obriši
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function openDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    // Zatvori modal ako se klikne izvan njega
+    window.onclick = function(event) {
+        const modal = document.getElementById('deleteModal');
+        if (event.target == modal) {
+            closeDeleteModal();
+        }
+    }
+    </script>
+
 </x-app-layout>

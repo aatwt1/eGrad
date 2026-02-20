@@ -11,7 +11,6 @@
                 </p>
             </div>
 
-            {{-- DUGME ZA KREIRANJE NOVE INICIJATIVE --}}
             <a href="{{ route('initiatives.create') }}" 
                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,7 +21,6 @@
         </div>
     </x-slot>
 
-    {{-- CONTENT --}}
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
@@ -32,7 +30,7 @@
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('initiatives.index') }}" 
                            class="px-4 py-2 rounded-full text-sm {{ request('status') === null ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
-                            Sve ({{ $initiatives->count() }})
+                            Sve ({{ $initiatives->total() }})
                         </a>
                         <a href="{{ route('initiatives.index', ['status' => 'pending']) }}" 
                            class="px-4 py-2 rounded-full text-sm {{ request('status') == 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
@@ -47,22 +45,11 @@
                             Odbijene
                         </a>
                     </div>
-                    
-                    <!-- Pretraga (opciono) -->
-                    <div class="relative">
-                        <input type="text" 
-                               placeholder="Pretraži inicijative..." 
-                               class="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
                 </div>
             </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-
+                <div class="p-6">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="border-b text-gray-600">
@@ -70,14 +57,12 @@
                                 <th class="text-left py-3">Mjesna zajednica</th>
                                 <th class="text-center py-3">Glasovi</th>
                                 <th class="text-center py-3">Status</th>
-                                <th class="text-right py-3">Akcije</th>
+                                <th class="text-center py-3">Glasaj</th>
                             </tr>
                         </thead>
-
                         <tbody class="divide-y">
                             @forelse($initiatives as $initiative)
                                 <tr class="hover:bg-gray-50">
-                                    {{-- TITLE --}}
                                     <td class="py-4">
                                         <div class="font-medium">
                                             <a href="{{ route('initiatives.show', $initiative) }}" 
@@ -93,19 +78,16 @@
                                         </div>
                                     </td>
 
-                                    {{-- LOCAL COMMUNITY --}}
                                     <td class="py-4">
-                                        {{ $initiative->localCommunity->name ?? 'Sva mjesne zajednice' }}
+                                        {{ $initiative->localCommunity->name ?? 'Sve mjesne zajednice' }}
                                     </td>
 
-                                    {{-- VOTES --}}
                                     <td class="py-4 text-center">
-                                        <div class="font-semibold text-lg {{ $initiative->votes->count() > 0 ? 'text-blue-600' : 'text-gray-400' }}">
-                                            {{ $initiative->votes->count() }}
+                                        <div class="font-semibold text-lg {{ $initiative->votes_count > 0 ? 'text-blue-600' : 'text-gray-400' }}">
+                                            {{ $initiative->votes_count }}
                                         </div>
                                     </td>
 
-                                    {{-- STATUS --}}
                                     <td class="py-4 text-center">
                                         @php
                                             $statusClasses = [
@@ -119,98 +101,72 @@
                                                 'rejected' => 'Odbijeno',
                                             ];
                                         @endphp
-
-                                        <span class="px-3 py-1 rounded-full text-xs font-medium
-                                            {{ $statusClasses[$initiative->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                        <span class="px-3 py-1 rounded-full text-xs font-medium {{ $statusClasses[$initiative->status] ?? 'bg-gray-100' }}">
                                             {{ $statusTexts[$initiative->status] ?? ucfirst($initiative->status) }}
                                         </span>
                                     </td>
 
-                                    {{-- ACTIONS --}}
-                                    <td class="py-4 text-right space-x-3">
-                                        <a href="{{ route('initiatives.show', $initiative) }}"
-                                           class="text-blue-600 hover:underline text-sm">
-                                            Detalji
-                                        </a>
-
-                                        @can('vote', $initiative)
-                                            <form method="POST" action="{{ route('initiatives.vote', $initiative) }}" class="inline">
-                                                @csrf
-                                                <button type="submit" 
-                                                        class="text-green-600 hover:underline text-sm">
-                                                    Glasaj
-                                                </button>
-                                            </form>
-                                        @endcan
-
-                                        @can('approve_initiative')
-                                            <a href="{{ route('initiatives.edit', $initiative) }}"
-                                               class="text-indigo-600 hover:underline text-sm">
-                                                Uredi
-                                            </a>
-
-                                            <form method="POST"
-                                                  action="{{ route('initiatives.destroy', $initiative) }}"
-                                                  class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button
-                                                    onclick="return confirm('Jeste li sigurni da želite obrisati ovu inicijativu?')"
-                                                    class="text-red-600 hover:underline text-sm">
-                                                    Obriši
-                                                </button>
-                                            </form>
-                                        @endcan
+                                    <td class="py-4 text-center">
+                                        @auth
+                                            @if($initiative->status === 'approved' && !$initiative->votes->contains('user_id', auth()->id()))
+                                                <form method="POST" action="{{ route('initiatives.vote', $initiative) }}" class="inline">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            class="vote-btn-active inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium">
+                                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                                                        </svg>
+                                                        Glasaj
+                                                    </button>
+                                                </form>
+                                            @elseif($initiative->status === 'approved' && $initiative->votes->contains('user_id', auth()->id()))
+                                                <span class="text-green-600 text-xs font-medium inline-flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    Glasali ste
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400 text-xs font-medium inline-flex items-center cursor-not-allowed">
+                                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                                    </svg>
+                                                    Nije dostupno
+                                                </span>
+                                            @endif
+                                        @endauth
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-8 text-center text-gray-500">
-                                        <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            <p class="text-gray-500 mb-4">Trenutno nema inicijativa.</p>
-                                            <a href="{{ route('initiatives.create') }}" 
-                                               class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
-                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                                </svg>
-                                                Pokreni prvu inicijativu
-                                            </a>
-                                        </div>
+                                    <td colspan="6" class="py-8 text-center text-gray-500">
+                                        <p>Trenutno nema inicijativa.</p>
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
-
-                    <!-- Paginacija -->
                     @if(method_exists($initiatives, 'links'))
-                        <div class="mt-6">
-                            {{ $initiatives->links() }}
-                        </div>
+                        <div class="mt-6">{{ $initiatives->links() }}</div>
                     @endif
-
                 </div>
             </div>
-
-            <!-- Info card -->
-            <div class="mt-6 bg-blue-50 border border-blue-100 rounded-lg p-4">
-                <div class="flex items-start">
-                    <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                        <h4 class="text-sm font-medium text-blue-800">Kako funkcionišu inicijative?</h4>
-                        <p class="text-sm text-blue-600 mt-1">
-                            Svaki građanin može pokrenuti novu inicijativu. Inicijativa prvo ide na odobrenje, 
-                            a nakon toga građani mogu glasati. Inicijative sa najviše glasova ulaze u proces realizacije.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        .vote-btn-active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .vote-btn-active:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+        }
+    </style>
+    @endpush
 </x-app-layout>

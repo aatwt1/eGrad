@@ -6,6 +6,7 @@ use App\Http\Controllers\InitiativeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReportIssueController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Middleware\AdminMiddleware;
 
 /*---------------
 -Početna strana
@@ -19,7 +20,7 @@ Route::middleware([
 /*----------------
  - Admin rute
 ------------------*/
-Route::middleware(['auth', 'admin'])
+Route::middleware(['auth', 'is_admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -70,21 +71,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         ->name('events.show');
     Route::post('/events/{event}/comments', [EventController::class, 'storeComment'])
         ->name('events.comments.store');
-
-    // Prijava problema
-    /*Route::get('/report-issues', [ReportIssueController::class, 'index'])
-        ->name('report-issues.index');
-    Route::get('/report-issues/create', [ReportIssueController::class, 'create'])
-        ->name('report-issues.create');
-    Route::post('/report-issues', [ReportIssueController::class, 'store'])
-        ->name('report-issues.store');
-    Route::get('/report-issues/{issue}', [ReportIssueController::class, 'show'])
-        ->name('report-issues.show');
-    Route::post('/report-issues/{issue}/comments', [ReportIssueController::class, 'storeComment'])
-        ->name('report-issues.comments.store');*/
-
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -116,40 +103,45 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         ->name('budgets.destroy');
 });
 
-
 /*
 |--------------------------------------------------------------------------
-| Events
+| Reported Issues - POTPUNI RESOURCE RUTE
 |--------------------------------------------------------------------------
 */
-//Route::middleware(['auth:sanctum', 'verified'])->resource('events', EventController::class);
-
-
-/*
-|--------------------------------------------------------------------------
-| Reported Issues
-|--------------------------------------------------------------------------
-*/
-//Route::middleware(['auth:sanctum', 'verified'])->resource('reported-issues', ReportIssueController::class);
-
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
+    // Osnovne rute za pregled i kreiranje (već postoje)
     Route::get('/reported-issues', [ReportIssueController::class, 'index'])
         ->name('reported-issues.index');
 
     Route::get('/reported-issues/create', [ReportIssueController::class, 'create'])
         ->name('reported-issues.create');
-
     
     Route::post('/reported-issues', [ReportIssueController::class, 'store'])
         ->name('reported-issues.store');
 
-    Route::post(
-        '/reported-issues/{reportedIssue}/comments',
-        [ReportIssueController::class, 'storeComment']
-    )->name('reported-issues.comments.store');
-
     Route::get('/reported-issues/{reportedIssue}', [ReportIssueController::class, 'show'])
-    ->name('reported-issues.show');
+        ->name('reported-issues.show');
 
+    Route::post('/reported-issues/{reportedIssue}/comments', [ReportIssueController::class, 'storeComment'])
+        ->name('reported-issues.comments.store');
+
+    // **NOVE RUTE - ZA UREĐIVANJE I BRISANJE**
+    // Ove rute će koristiti policy za autorizaciju (admin može sve, građani samo svoje)
+    
+    // Edit - prikaz forme za uređivanje
+    Route::get('/reported-issues/{reportedIssue}/edit', [ReportIssueController::class, 'edit'])
+        ->name('reported-issues.edit');
+    
+    // Update - spremanje izmjena
+    Route::put('/reported-issues/{reportedIssue}', [ReportIssueController::class, 'update'])
+        ->name('reported-issues.update');
+    
+    // Delete - prikaz stranice za potvrdu brisanja
+    Route::get('/reported-issues/{reportedIssue}/delete', [ReportIssueController::class, 'delete'])
+        ->name('reported-issues.delete');
+    
+    // Destroy - brisanje iz baze
+    Route::delete('/reported-issues/{reportedIssue}', [ReportIssueController::class, 'destroy'])
+        ->name('reported-issues.destroy');
 });

@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -20,31 +21,37 @@
 <body class="font-sans antialiased bg-gray-100">
 
     <!-- Top Navigation -->
-    <nav class="bg-white border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold text-blue-700">Digitalna Općina</span>
-                    <span class="ml-4 px-3 py-1 bg-red-100 text-red-800 text-sm font-medium rounded-full">
-                        Admin Panel
-                    </span>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-600">
-                        {{ auth()->user()->name }}
-                    </span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">
-                            Odjava
-                        </button>
-                    </form>
-                </div>
+<nav class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center h-16">
+            <!-- Lijevi dio - Logo (više prostora) -->
+            <div class="flex-[2] flex justify-start">
+                <span class="text-2xl font-bold text-blue-400">Digitalna Općina Atl</span>
+            </div>
+            
+            <!-- Srednji dio - Navigacija -->
+            <div class="flex-1 flex justify-center items-center space-x-8">
+                <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Admin panel</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Budžet</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Inicijative</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Prijave problema</a>
+            </div>
+            
+            <!-- Desni dio - Korisnik i odjava -->
+            <div class="flex-1 flex justify-end items-center space-x-4">
+                <span class="text-sm text-gray-600">
+                    {{ auth()->user()->name }}
+                </span>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">
+                        Odjava
+                    </button>
+                </form>
             </div>
         </div>
-    </nav>
-
+    </div>
+</nav>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
@@ -134,7 +141,7 @@
 
             <!-- Charts Row -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <!-- Inicijative po mjesecima -->
+                <!-- Inicijative po mjesecima - HISTOGRAM -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-semibold mb-4">Inicijative po mjesecima</h3>
                     <div class="h-64">
@@ -267,26 +274,66 @@
     <!-- Chart.js Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicijative po mjesecima
+            // Inicijative po mjesecima - HISTOGRAM sa 6 mjeseci
             const ctx1 = document.getElementById('initiativesChart');
             if (ctx1) {
+                // Generisanje podataka za zadnjih 6 mjeseci
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+                const last6Months = [];
+                const last6MonthsData = [];
+                
+                const today = new Date();
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                    const monthYear = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                    last6Months.push(monthNames[d.getMonth()] + ' ' + d.getFullYear());
+                    
+                    // Pronađi podatak za ovaj mjesec ili postavi 0
+                    const existingData = {!! json_encode($initiativesByMonth) !!};
+                    const found = existingData.find(item => 
+                        item.year == d.getFullYear() && item.month == (d.getMonth() + 1)
+                    );
+                    last6MonthsData.push(found ? found.total : 0);
+                }
+
                 new Chart(ctx1, {
-                    type: 'line',
+                    type: 'bar', // Promijenjeno u histogram (bar)
                     data: {
-                        labels: {!! json_encode($initiativesByMonth->map(function($item) { 
-                            return $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT); 
-                        })) !!},
+                        labels: last6Months,
                         datasets: [{
                             label: 'Broj inicijativa',
-                            data: {!! json_encode($initiativesByMonth->pluck('total')) !!},
+                            data: last6MonthsData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
                             borderColor: '#3B82F6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            tension: 0.4
+                            borderWidth: 1,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.8
                         }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.raw + ' inicijativa';
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
             }

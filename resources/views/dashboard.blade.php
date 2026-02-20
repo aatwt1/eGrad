@@ -24,29 +24,29 @@
                         <!-- Logo -->
                         <div class="flex-shrink-0 flex items-center">
                             <a href="{{ route('dashboard') ?? url('/') }}" class="flex items-center">
-                                <span class="text-2xl font-bold text-blue-700">Digitalna Općina</span>
+                                <span class="text-2xl font-bold text-blue-400">Digitalna Općina Atl</span>
                             </a>
                         </div>
 
                         <!-- Desktop Navigation Links -->
                         <div class="hidden sm:ml-10 sm:flex sm:space-x-8">
                             <a href="{{ route('dashboard') ?? url('/') }}" 
-                               class="{{ request()->routeIs('dashboard') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                               class="{{ request()->routeIs('dashboard') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Početna
                             </a>
                             
                             <a href="{{ route('budgets.index') ?? '#' }}" 
-                               class="{{ request()->routeIs('budgets.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                               class="{{ request()->routeIs('budgets.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Budžet
                             </a>
                             
                             <a href="{{ route('initiatives.index') ?? '#' }}" 
-                               class="{{ request()->routeIs('initiatives.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                               class="{{ request()->routeIs('initiatives.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Inicijative
                             </a>
                             
                             <a href="{{ route('reported-issues.index') ?? '#' }}" 
-                               class="{{ request()->routeIs('reported-issues.*') ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                               class="{{ request()->routeIs('reported-issues.*') ? 'border-blue-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Prijava problema
                             </a>
                         </div>
@@ -114,97 +114,12 @@
                         @endauth
                     </div>
 
-                    <!-- Mobile menu button -->
-                    <div class="flex items-center sm:hidden">
-                        <button type="button" 
-                                @click="mobileMenuOpen = !mobileMenuOpen"
-                                x-data="{ mobileMenuOpen: false }"
-                                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
-                            <span class="sr-only">Otvori meni</span>
-                            <svg :class="{'hidden': mobileMenuOpen, 'block': !mobileMenuOpen}" 
-                                 class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                            <svg :class="{'hidden': !mobileMenuOpen, 'block': mobileMenuOpen}" 
-                                 class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Mobile menu -->
-                <div class="sm:hidden" x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false">
-                    <div class="pt-2 pb-3 space-y-1">
-                        <a href="{{ route('dashboard') ?? url('/') }}" 
-                           class="{{ request()->routeIs('dashboard') ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            Početna
-                        </a>
-                        
-                        <a href="{{ route('budgets.index') ?? '#' }}" 
-                           class="{{ request()->routeIs('budgets.*') ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            Budžet
-                        </a>
-                        
-                        <a href="{{ route('initiatives.index') ?? '#' }}" 
-                           class="{{ request()->routeIs('initiatives.*') ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            Inicijative
-                        </a>
-                        
-                        <a href="{{ route('reported-issues.index') ?? '#' }}" 
-                           class="{{ request()->routeIs('reported-issues.*') ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700' }} block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
-                            Prijava problema
-                        </a>
-                    </div>
-                    
-                    @auth
-                    <div class="pt-4 pb-3 border-t border-gray-200">
-                        <div class="flex items-center px-4">
-                            <div class="flex-shrink-0">
-                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                </div>
-                            </div>
-                            <div class="ml-3">
-                                <div class="text-base font-medium text-gray-800">{{ Auth::user()->name }}</div>
-                                <div class="text-sm font-medium text-gray-500">{{ Auth::user()->email }}</div>
-                            </div>
-                        </div>
-                        <div class="mt-3 space-y-1">
-                            <a href="{{ route('profile.show') ?? '#' }}" 
-                               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
-                                Profil
-                            </a>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" 
-                                        class="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
-                                    Odjava
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    @else
-                    <div class="pt-4 pb-3 border-t border-gray-200">
-                        <div class="space-y-1">
-                            <a href="{{ route('login') }}" 
-                               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
-                                Prijava
-                            </a>
-                            <a href="{{ route('register') }}" 
-                               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
-                                Registracija
-                            </a>
-                        </div>
-                    </div>
-                    @endauth
-                </div>
+                   
             </div>
         </nav>
 
         {{-- HERO --}}
         <section class="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
-            <!-- PRAZAN PROSTOR IZNAD SADRŽAJA UNUTAR PLAVE POZADINE -->
             <div class="h-24"></div>
             
             <div class="max-w-7xl mx-auto px-6 text-center">
@@ -264,17 +179,17 @@
                         </a>
                     </div>
 
-                    {{-- Događaji --}}
+                    {{-- Inicijative --}}
                     <div class="bg-white rounded-xl shadow p-6 flex flex-col hover:shadow-lg transition">
                         <h3 class="text-xl font-semibold text-blue-700 mb-2">
-                            Događaji i dozvole
+                            Građanske inicijative
                         </h3>
                         <p class="text-gray-600 flex-grow">
-                            Podnesite zahtjev za organizaciju javnih događaja ili potrebne dozvole.
+                            Podnesite zahtjev za inicijative koje biste radu vidjeli u gradu i u sklopu budžeta.
                         </p>
-                        <a href="{{ route('events.index') ?? '#' }}"
+                        <a href="{{ route('initiatives.index') ?? '#' }}"
                            class="mt-4 text-blue-600 font-medium hover:underline inline-flex items-center">
-                            Pogledaj događaje
+                            Pogledaj inicijative
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                             </svg>
@@ -289,7 +204,7 @@
         <section class="bg-white py-16 border-t">
             <div class="max-w-4xl mx-auto px-6 text-center">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">
-                    Vaše mišljenje je važno
+                    Očekujemo vaše mišljenje.
                 </h2>
                 <p class="text-gray-600 mb-8 text-lg">
                     Imate prijedlog, pitanje ili inicijativu? Javite nam se i učestvujte u razvoju vaše zajednice.
@@ -308,7 +223,6 @@
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <div class="mb-4 md:mb-0">
                         <span class="text-xl font-bold text-white">Digitalna Općina</span>
-                        <p class="text-gray-300 mt-2">Transparentno upravljanje za bolju zajednicu</p>
                     </div>
                     <div class="text-center md:text-right">
                         <p>&copy; {{ date('Y') }} Digitalna Općina. Sva prava zadržana.</p>
@@ -321,8 +235,6 @@
                 </div>
             </div>
         </footer>
-
-        <!-- Alpine.js for mobile menu -->
         <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
     </body>
 </html>

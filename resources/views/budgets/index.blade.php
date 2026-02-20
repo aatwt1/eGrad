@@ -36,6 +36,21 @@
                     </p>
                 </div>
             @else
+                @php
+                    // Izračunaj zbir svih kategorija
+                    $totalAllocated = $budget->categories->sum('allocated_amount');
+                    // Izračunaj razliku za 'Ostalo'
+                    $otherAmount = $budget->total_amount - $totalAllocated;
+                    // Dodaj 'Ostalo' kao posebnu kategoriju za prikaz
+                    $allCategories = $budget->categories->toArray();
+                    if ($otherAmount > 0) {
+                        $allCategories[] = [
+                            'category_name' => 'Ostalo',
+                            'allocated_amount' => $otherAmount
+                        ];
+                    }
+                @endphp
+
                 {{-- SUMMARY STATS --}}
                 <div class="grid md:grid-cols-3 gap-6 mb-10">
                     <div class="bg-white rounded-xl shadow p-6">
@@ -46,13 +61,13 @@
                     </div>
 
                     <div class="bg-white rounded-xl shadow p-6">
-                        <p class="text-sm text-gray-500">Broj kategorija</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-2">
-                            {{ $budget->categories->count() }}
+                        <p class="text-sm text-gray-500">Raspoređeno po kategorijama</p>
+                        <p class="text-2xl font-bold text-green-700 mt-2">
+                            {{ number_format($totalAllocated, 2, ',', '.') }} KM
                         </p>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow p-6">
+                     <div class="bg-white rounded-xl shadow p-6">
                         <p class="text-sm text-gray-500">Napomena</p>
                         <p class="text-gray-700 mt-2">
                             {{ $budget->notes ?? 'Nema dodatnih napomena.' }}
@@ -78,9 +93,9 @@
                             Detalji po kategorijama
                         </h3>
 
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto max-h-96">
                             <table class="w-full text-sm">
-                                <thead>
+                                <thead class="sticky top-0 bg-white">
                                     <tr class="border-b">
                                         <th class="text-left py-2 font-medium text-gray-500">Kategorija</th>
                                         <th class="text-right py-2 font-medium text-gray-500">Iznos (KM)</th>
@@ -89,8 +104,14 @@
                                 </thead>
                                 <tbody>
                                     @foreach($budget->categories as $category)
-                                    <tr class="border-b last:border-none hover:bg-gray-50">
-                                        <td class="py-3">{{ $category->category_name }}</td>
+                                    <tr class="border-b hover:bg-gray-50" 
+                                        onmouseover="showTooltip(this, '{{ number_format($category->allocated_amount, 2, ',', '.') }} KM ({{ number_format(($category->allocated_amount / $budget->total_amount) * 100, 1) }}%)')"
+                                        onmouseout="hideTooltip()">
+                                        <td class="py-3 relative">
+                                            <span class="inline-block w-3 h-3 rounded-full mr-2" 
+                                                  style="background-color: {{ $chartColors[$loop->index] ?? '#3B82F6' }}"></span>
+                                            {{ $category->category_name }}
+                                        </td>
                                         <td class="py-3 text-right font-medium">
                                             {{ number_format($category->allocated_amount, 2, ',', '.') }}
                                         </td>
@@ -104,14 +125,32 @@
                                         </td>
                                     </tr>
                                     @endforeach
+
+                                    {{-- OSTALO RED --}}
+                                    @if($otherAmount > 0)
+                                    <tr class="border-b bg-gray-50 font-medium" 
+                                        onmouseover="showTooltip(this, '{{ number_format($otherAmount, 2, ',', '.') }} KM ({{ number_format(($otherAmount / $budget->total_amount) * 100, 1) }}%)')"
+                                        onmouseout="hideTooltip()">
+                                        <td class="py-3">
+                                            <span class="inline-block w-3 h-3 rounded-full mr-2" style="background-color: #9CA3AF"></span>
+                                            <span class="text-gray-600">Ostalo (neraspoređeno)</span>
+                                        </td>
+                                        <td class="py-3 text-right font-medium text-orange-600">
+                                            {{ number_format($otherAmount, 2, ',', '.') }}
+                                        </td>
+                                        <td class="py-3 text-right text-gray-500">
+                                            {{ number_format(($otherAmount / $budget->total_amount) * 100, 1) }}%
+                                        </td>
+                                    </tr>
+                                    @endif
                                 </tbody>
-                                <tfoot>
-                                    <tr class="border-t font-semibold">
+                                <tfoot class="sticky bottom-0 bg-white border-t-2 border-gray-300">
+                                    <tr class="font-bold">
                                         <td class="py-3">UKUPNO</td>
-                                        <td class="py-3 text-right">
+                                        <td class="py-3 text-right text-blue-700">
                                             {{ number_format($budget->total_amount, 2, ',', '.') }}
                                         </td>
-                                        <td class="py-3 text-right">100%</td>
+                                        <td class="py-3 text-right text-blue-700">100%</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -128,9 +167,19 @@
                                     <span class="truncate">{{ $category->category_name }}</span>
                                 </div>
                                 @endforeach
+                                @if($otherAmount > 0)
+                                <div class="flex items-center">
+                                    <span class="inline-block w-3 h-3 rounded-full mr-2 bg-gray-400"></span>
+                                    <span class="truncate">Ostalo (neraspoređeno)</span>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {{-- TOOLTIP ZA PRIKAZ --}}
+                <div id="tooltip" class="fixed hidden bg-gray-800 text-white text-xs rounded py-1 px-2 pointer-events-none z-50">
                 </div>
 
                 {{-- DODATNE INFORMACIJE --}}
@@ -139,8 +188,8 @@
                     <div class="bg-blue-50 border border-blue-100 rounded-xl p-6">
                         <h4 class="font-medium text-blue-800 mb-2">📊 Kako se koristi budžet?</h4>
                         <p class="text-blue-700 text-sm">
-                            Budžet općine se raspoređuje kroz participativne procese u kojima građani 
-                            direktno predlažu projekte. Svaki gradanin može glasati za projekte koji 
+                            Budžet općine se raspoređuje kroz participativne procese u kojima učestvuju vlast te građani. 
+                            Svaki gradanin može direktno predlažiti projekte kroz inicijative i glasati za projekte koji 
                             će se finansirati iz ove kategorije.
                         </p>
                     </div>
@@ -171,6 +220,23 @@
         </div>
     </div>
 
+    {{-- TOOLTIP JAVASCRIPT --}}
+    <script>
+        function showTooltip(element, text) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.textContent = text;
+            tooltip.classList.remove('hidden');
+            
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = rect.left + window.scrollX + 'px';
+            tooltip.style.top = (rect.top + window.scrollY - 30) + 'px';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.add('hidden');
+        }
+    </script>
+
     {{-- CHART.JS --}}
     @if($budget)
         @push('scripts')
@@ -179,21 +245,30 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const ctx = document.getElementById('budgetChart');
                 
-               
+                // Pripremi podatke za chart 
+                const chartLabels = {!! json_encode($budget->categories->pluck('category_name')) !!};
+                const chartData = {!! json_encode($budget->categories->pluck('allocated_amount')) !!};
+                
+                @if($otherAmount > 0)
+                    chartLabels.push('Ostalo');
+                    chartData.push({{ $otherAmount }});
+                @endif
+                
                 const chartColors = [
                     '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
                     '#8B5CF6', '#EC4899', '#14B8A6', '#F97316',
                     '#6366F1', '#8B5CF6', '#EC4899', '#F97316',
-                    '#3B82F6', '#10B981', '#F59E0B', '#EF4444'
+                    '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+                    '#9CA3AF' 
                 ];
                 
                 const chart = new Chart(ctx, {
                     type: 'pie',
                     data: {
-                        labels: {!! json_encode($budget->categories->pluck('category_name')) !!},
+                        labels: chartLabels,
                         datasets: [{
-                            data: {!! json_encode($budget->categories->pluck('allocated_amount')) !!},
-                            backgroundColor: chartColors.slice(0, {{ $budget->categories->count() }}),
+                            data: chartData,
+                            backgroundColor: chartColors.slice(0, chartLabels.length),
                             borderWidth: 2,
                             borderColor: '#FFFFFF'
                         }]
@@ -210,8 +285,8 @@
                                     label: function(context) {
                                         const label = context.label || '';
                                         const value = context.parsed || 0;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                        const total = {{ $budget->total_amount }};
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                                         return `${label}: ${value.toLocaleString('bs-BA')} KM (${percentage}%)`;
                                     }
                                 }
@@ -229,6 +304,9 @@
         <style>
             canvas {
                 max-width: 100%;
+            }
+            .sticky {
+                position: sticky;
             }
         </style>
         @endpush

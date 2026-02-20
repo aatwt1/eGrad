@@ -4,27 +4,23 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Initiative;
-use Illuminae\Http\Request;
+use App\Models\Comment;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class InitiativeController extends Controller
 {
-    public function __construct()
-    {
-        // Middleware za admin provjeru
-        $this->middleware(function ($request, $next) {
-            if (!Auth::user() || !Auth::user()->isAdmin()) {
-                abort(403, 'Samo administratori mogu pristupiti ovoj stranici.');
-            }
-            return $next($request);
-        });
-    }
-
+    /**
+     * Prikaz svih inicijativa za admina
+     */
     public function index(Request $request)
     {
         // Base query sa potrebnim podacima
         $query = Initiative::with('user')
-            ->withCount(['comments', 'supporters']);
+            ->withCount([
+                'comments',
+                'votes as votes_count'
+            ]);
 
         // Filtriranje po statusu
         if ($request->filled('status')) {
@@ -33,24 +29,17 @@ class InitiativeController extends Controller
 
         // Pretraga po naslovu, opisu ili kategoriji
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
-            });
+            $query->search($request->search);
         }
 
         // Sortiranje
         $sortField = $request->get('sort', 'created_at');
         $sortDirection = $request->get('direction', 'desc');
         
-        if (in_array($sortField, ['title', 'status', 'created_at', 'comments_count', 'supporters_count'])) {
-            if ($sortField === 'comments_count' || $sortField === 'supporters_count') {
-                $query->orderBy($sortField, $sortDirection);
-            } else {
-                $query->orderBy($sortField, $sortDirection);
-            }
+        $allowedSortFields = ['title', 'status', 'created_at', 'comments_count', 'votes_count'];
+        
+        if (in_array($sortField, $allowedSortFields)) {
+            $query->orderBy($sortField, $sortDirection);
         } else {
             $query->latest();
         }
@@ -77,11 +66,23 @@ class InitiativeController extends Controller
         return view('admin.initiatives.index', compact('initiatives', 'stats', 'statuses'));
     }
 
+
     public function show(Initiative $initiative)
     {
-        $initiative->load(['user', 'comments.user', 'supporters']);
-        
-        return view('admin.initiatives.show', compact('initiative'));
+    $initiative->load([
+        'user', 
+        'localCommunity',
+        'comments.user', 
+        'comments' => function($q) {
+            $q->latest();
+        }
+    ]);
+    
+    $initiative->loadCount('votes as votes_count');
+    
+    $statusInfo = $this->getStatusInfo($initiative->status);
+    
+    return view('admin.initiatives.show', compact('initiative', 'statusInfo'));
     }
 
     public function approve(Initiative $initiative)
@@ -93,10 +94,13 @@ class InitiativeController extends Controller
             'reviewed_by' => Auth::id(),
         ]);
 
+        $this->addSystemComment($initiative, 'Inicijativa je odobrena od strane administratora.');
+
         return redirect()->route('admin.initiatives.index')
             ->with('success', "Inicijativa '{$initiative->title}' je odobrena.");
     }
 
+    
     public function reject(Request $request, Initiative $initiative)
     {
         $request->validate([
@@ -111,10 +115,14 @@ class InitiativeController extends Controller
             'reviewed_by' => Auth::id(),
         ]);
 
+        
+        $this->addSystemComment($initiative, 'Inicijativa je odbijena. Razlog: ' . $request->rejection_reason);
+
         return redirect()->route('admin.initiatives.index')
             ->with('success', "Inicijativa '{$initiative->title}' je odbijena.");
     }
 
+   
     public function markImplemented(Initiative $initiative)
     {
         $initiative->update([
@@ -124,7 +132,56 @@ class InitiativeController extends Controller
             'reviewed_by' => Auth::id(),
         ]);
 
+        $this->addSystemComment($initiative, 'Inicijativa je označena kao implementirana.');
+
         return redirect()->route('admin.initiatives.index')
             ->with('success', "Inicijativa '{$initiative->title}' je označena kao implementirana.");
+    }
+
+  
+    private function addSystemComment(Initiative $initiative, string $content)
+    {
+        $initiative->comments()->create([
+            'user_id' => Auth::id(),
+            'content' => '[Sistem] ' . $content,
+        ]);
+    }
+
+   
+    public function deleteComment(Comment $comment)
+    {
+        if (Auth::user()->isAdmin()) {
+            $comment->delete();
+            return back()->with('success', 'Komentar je obrisan.');
+        }
+
+        return back()->with('error', 'Nemate dozvolu za brisanje komentara.');
+    }
+
+    private function getStatusInfo($status)
+    {
+    $statuses = [
+        'pending' => [
+            'text' => 'Na čekanju',
+            'color' => 'bg-yellow-100 text-yellow-800'
+        ],
+        'approved' => [
+            'text' => 'Odobreno',
+            'color' => 'bg-green-100 text-green-800'
+        ],
+        'rejected' => [
+            'text' => 'Odbijeno',
+            'color' => 'bg-red-100 text-red-800'
+        ],
+        'implemented' => [
+            'text' => 'Implementirano',
+            'color' => 'bg-purple-100 text-purple-800'
+        ]
+    ];
+
+    return $statuses[$status] ?? [
+        'text' => $status,
+        'color' => 'bg-gray-100 text-gray-800'
+    ];
     }
 }

@@ -229,31 +229,11 @@
                     </tbody>
                 </table>
 
-                <!-- Paginacija -->
                 @if($initiatives->hasPages())
                     <div class="px-6 py-4 border-t border-gray-200">
                         {{ $initiatives->links() }}
                     </div>
                 @endif
-            </div>
-
-            <!-- Legenda -->
-            <div class="mt-6 bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
-                <div class="flex items-center space-x-6">
-                    <span class="font-medium">Legenda:</span>
-                    <span class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>
-                        Na čekanju - potrebna akcija
-                    </span>
-                    <span class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-green-400 mr-2"></span>
-                        Odobreno - može se implementirati
-                    </span>
-                    <span class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-purple-400 mr-2"></span>
-                        Implementirano - završeno
-                    </span>
-                </div>
             </div>
 
         </div>
